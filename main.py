@@ -47,9 +47,11 @@ def get_available_id_ranges(min_range, max_range):
     return available_ranges
 
 # Example usage:
-directory_to_scan = r'F:\SteamLibrary\steamapps\workshop\content\304930'
+directory_to_scan = input("Enter the directory to scan: ")
 min_range = 2000
 max_range = 65535
 available_id_ranges = get_available_id_ranges(min_range, max_range)
 formatted_ranges = ', '.join(f"{start}-{end}" if start != end else f"{start}" for start, end in available_id_ranges)
 print("Available ID ranges:", formatted_ranges)
+
+input("Press Enter to exit...")
