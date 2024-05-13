@@ -46,7 +46,6 @@ def get_available_id_ranges(min_range, max_range):
         available_ranges.append((start, max_range))
     return available_ranges
 
-# Example usage:
 directory_to_scan = input("Enter the directory to scan: ")
 min_range = 2000
 max_range = 65535
