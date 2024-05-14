@@ -3,6 +3,11 @@ import re
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 import sv_ttk
+import time
+
+start_time = 0
+num_dat_files = 0
+
 
 def extract_info_from_file(file_path):
     info = {}
@@ -20,14 +25,24 @@ def extract_info_from_file(file_path):
     return info
 
 def scan_directory_for_info(directory):
+    global start_time, num_dat_files
+    start_time = time.time()
+    num_dat_files = 0
+    ignored_languages = ['english', 'spanish', 'arabic', 'hindi', 'bengali', 'portuguese', 'russian', 'japanese', 'punjabi', 'german']  # List of top 10 most common languages to be ignored
     all_info = []
     for root, dirs, files in os.walk(directory):
         for file in files:
             if file.endswith('.dat'):
-                file_path = os.path.join(root, file)
-                info = extract_info_from_file(file_path)
-                all_info.append(info)
+                lang_match = re.search(r'_(\w+)\.dat$', file.lower())  # Match common language patterns
+                if lang_match:
+                    lang = lang_match.group(1)
+                    if lang not in ignored_languages:
+                        num_dat_files += 1
+                        file_path = os.path.join(root, file)
+                        info = extract_info_from_file(file_path)
+                        all_info.append(info)
     return all_info
+
 
 def get_available_id_ranges(min_range, max_range, directory_to_scan):
     available_ids = set(range(min_range, max_range + 1))
@@ -64,9 +79,19 @@ def scan_directory():
         messagebox.showerror("Error", "Invalid directory!")
         return
     
+    start_scan = time.time()
     available_id_ranges = get_available_id_ranges(min_range, max_range, directory_to_scan)
+    end_scan = time.time()
+    
     formatted_ranges = ', '.join(f"{start}-{end}" if start != end else f"{start}" for start, end in available_id_ranges)
     result_label.config(text="Available ID ranges: " + formatted_ranges)
+    
+    # Calculate time taken
+    time_taken = end_scan - start_scan
+    # Log time taken and number of .dat files read
+    log_text = f"Time taken to scan: {time_taken:.2f} seconds\nNumber of .dat files read: {num_dat_files}"
+    log_label.config(text=log_text)
+
 
 # Create the main window
 root = tk.Tk()
@@ -103,6 +128,10 @@ button_scan.grid(row=3, column=0, columnspan=3, padx=5, pady=5)
 
 result_label = ttk.Label(root, text="", wraplength=400)
 result_label.grid(row=4, column=0, columnspan=3, padx=5, pady=5)
+
+log_label = ttk.Label(root, text="", wraplength=400)
+log_label.grid(row=5, column=0, columnspan=3, padx=5, pady=5)
+
 
 # Run the main event loop
 root.mainloop()
