@@ -58,7 +58,7 @@ class ScanTab(ttk.Frame):
    def get_available_id_ranges(self, min_range, max_range, directory_to_scan):
       available_ids = set(range(min_range, max_range + 1))
       # After scanning in the scan_tab.py:
-      all_info, time_taken, num_dat_files, duplicate_ids = scan_directory_for_info(directory_to_scan)
+      all_info, num_dat_files, duplicate_ids = scan_directory_for_info(directory_to_scan)
       if self.duplicates_tab:  # Check if duplicates_tab is set
           self.duplicates_tab.display_duplicate_ids(duplicate_ids)
       used_ids = set()
@@ -76,7 +76,7 @@ class ScanTab(ttk.Frame):
                start = None
       if start is not None:
             available_ranges.append((start, max_range))
-      return available_ranges
+      return available_ranges, num_dat_files
 
    def scan_directory(self):
       directory_to_scan = self.entry_directory.get()
@@ -89,7 +89,7 @@ class ScanTab(ttk.Frame):
 
       # Code to perform scanning
       start_scan = time.time()
-      available_id_ranges = self.get_available_id_ranges(min_range, max_range, directory_to_scan)
+      available_id_ranges, num_dat_files = self.get_available_id_ranges(min_range, max_range, directory_to_scan)
       end_scan = time.time()
 
       formatted_ranges = ', '.join(f"{start}-{end}" if start != end else f"{start}" for start, end in available_id_ranges)
@@ -98,6 +98,9 @@ class ScanTab(ttk.Frame):
 
       # Calculate time taken
       time_taken = end_scan - start_scan
+
+      # Notify the user that the scan is complete
+      messagebox.showinfo("Scan Complete", f"The scan has finished successfully. \n\nThe scan took {time_taken:.2f} seconds \nSuccessfully read {num_dat_files} DAT files")
       # Log time taken and number of .dat files read
       #self.logs_tab.add_log("Scan started at: " + time.strftime("%Y-%m-%d %H:%M:%S"))
       #self.logs_tab.add_log(f"Time taken to scan: {time_taken:.2f} seconds\nNumber of .dat files read: {num_dat_files}")

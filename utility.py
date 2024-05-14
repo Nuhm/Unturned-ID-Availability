@@ -18,7 +18,6 @@ def extract_info_from_file(file_path):
    return info
 
 def scan_directory_for_info(directory):
-   start_time = time.time()
    num_dat_files = 0
    ignored_languages = ['english', 'spanish', 'arabic', 'hindi', 'bengali', 'portuguese', 'russian', 'japanese', 'punjabi', 'german']  
    all_info = []
@@ -41,6 +40,4 @@ def scan_directory_for_info(directory):
                               duplicate_ids.add(info['ID'])
                            else:
                               encountered_ids.add(info['ID'])
-   end_time = time.time()
-   time_taken = end_time - start_time
-   return all_info, time_taken, num_dat_files, duplicate_ids
+   return all_info, num_dat_files, duplicate_ids

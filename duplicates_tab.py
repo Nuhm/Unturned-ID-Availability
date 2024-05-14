@@ -30,7 +30,6 @@ class DuplicatesTab(ttk.Frame):
 
         # Display the duplicate IDs
         if duplicate_ids:
-            self.duplicates_text.insert(tk.END, "Duplicate IDs found:\n")
             for id in duplicate_ids:
                 self.duplicates_text.insert(tk.END, f"{id}\n")
         else:

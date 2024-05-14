@@ -12,6 +12,7 @@ from utility import scan_directory_for_info
 root = tk.Tk()
 root.title("ID Scanner")
 root.resizable(False, False)
+root.geometry("650x350")
 
 # Create a style object
 sv_ttk.set_theme("dark")
