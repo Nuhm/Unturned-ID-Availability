@@ -1,5 +1,8 @@
 import os
 import re
+import tkinter as tk
+from tkinter import filedialog, messagebox, ttk
+import sv_ttk
 
 def extract_info_from_file(file_path):
     info = {}
@@ -26,7 +29,7 @@ def scan_directory_for_info(directory):
                 all_info.append(info)
     return all_info
 
-def get_available_id_ranges(min_range, max_range):
+def get_available_id_ranges(min_range, max_range, directory_to_scan):
     available_ids = set(range(min_range, max_range + 1))
     all_info = scan_directory_for_info(directory_to_scan)
     used_ids = set()
@@ -46,11 +49,60 @@ def get_available_id_ranges(min_range, max_range):
         available_ranges.append((start, max_range))
     return available_ranges
 
-directory_to_scan = input("Enter the directory to scan: ")
-min_range = 2000
-max_range = 65535
-available_id_ranges = get_available_id_ranges(min_range, max_range)
-formatted_ranges = ', '.join(f"{start}-{end}" if start != end else f"{start}" for start, end in available_id_ranges)
-print("Available ID ranges:", formatted_ranges)
+def browse_directory():
+    directory_to_scan = filedialog.askdirectory()
+    if directory_to_scan:
+        entry_directory.delete(0, tk.END)
+        entry_directory.insert(0, directory_to_scan)
 
-input("Press Enter to exit...")
+def scan_directory():
+    directory_to_scan = entry_directory.get()
+    min_range = int(entry_min_range.get())
+    max_range = int(entry_max_range.get())
+    
+    if not os.path.isdir(directory_to_scan):
+        messagebox.showerror("Error", "Invalid directory!")
+        return
+    
+    available_id_ranges = get_available_id_ranges(min_range, max_range, directory_to_scan)
+    formatted_ranges = ', '.join(f"{start}-{end}" if start != end else f"{start}" for start, end in available_id_ranges)
+    result_label.config(text="Available ID ranges: " + formatted_ranges)
+
+# Create the main window
+root = tk.Tk()
+root.title("ID Scanner")
+
+root.resizable(False, False)
+root.configure(padx=25, pady=25)
+
+# Create a style object
+sv_ttk.set_theme("dark")
+
+# Create and place widgets
+label_directory = ttk.Label(root, text="Directory to scan:")
+label_directory.grid(row=0, column=0, padx=5, pady=5, sticky="w")
+entry_directory = ttk.Entry(root, width=50)
+entry_directory.grid(row=0, column=1, padx=5, pady=5)
+button_browse = ttk.Button(root, text="Browse", command=browse_directory)
+button_browse.grid(row=0, column=2, padx=5, pady=5)
+
+label_min_range = ttk.Label(root, text="Minimum range:")
+label_min_range.grid(row=1, column=0, padx=5, pady=5, sticky="w")
+entry_min_range = ttk.Entry(root, width=10)
+entry_min_range.grid(row=1, column=1, padx=5, pady=5)
+entry_min_range.insert(0, "2000")
+
+label_max_range = ttk.Label(root, text="Maximum range:")
+label_max_range.grid(row=2, column=0, padx=5, pady=5, sticky="w")
+entry_max_range = ttk.Entry(root, width=10)
+entry_max_range.grid(row=2, column=1, padx=5, pady=5)
+entry_max_range.insert(0, "65535")
+
+button_scan = ttk.Button(root, text="Scan Directory", command=scan_directory)
+button_scan.grid(row=3, column=0, columnspan=3, padx=5, pady=5)
+
+result_label = ttk.Label(root, text="", wraplength=400)
+result_label.grid(row=4, column=0, columnspan=3, padx=5, pady=5)
+
+# Run the main event loop
+root.mainloop()
