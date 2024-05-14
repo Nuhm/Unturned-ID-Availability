@@ -6,11 +6,15 @@ import re
 import time
 from utility import scan_directory_for_info
 from duplicates_tab import DuplicatesTab
+from ranges_tab import RangesTab
 
 class ScanTab(ttk.Frame):
    def __init__(self, master=None, **kw):
       super().__init__(master, **kw)
-      self.duplicates_tab = None  # Initialize duplicates_tab
+
+      # Initialize external tabs
+      self.ranges_tab = None
+      self.duplicates_tab = None
 
       # Widgets for the 'Scan' tab
       self.label_directory = ttk.Label(self, text="Directory to scan:")
@@ -39,11 +43,11 @@ class ScanTab(ttk.Frame):
       self.button_scan = ttk.Button(self, text="Scan Directory", command=self.scan_directory)
       self.button_scan.grid(row=3, column=0, columnspan=3, padx=5, pady=5)
 
-      self.result_label = ttk.Label(self, text="", wraplength=400)
-      self.result_label.grid(row=4, column=0, columnspan=3, padx=5, pady=5)
-
    def set_duplicates_tab(self, duplicates_tab):
       self.duplicates_tab = duplicates_tab
+
+   def set_ranges_tab(self, ranges_tab):
+      self.ranges_tab = ranges_tab
 
    def browse_directory(self):
       directory_to_scan = filedialog.askdirectory()
@@ -89,7 +93,8 @@ class ScanTab(ttk.Frame):
       end_scan = time.time()
 
       formatted_ranges = ', '.join(f"{start}-{end}" if start != end else f"{start}" for start, end in available_id_ranges)
-      self.result_label.config(text="Available ID ranges: " + formatted_ranges)
+      if self.ranges_tab:
+         self.ranges_tab.display_range_ids(formatted_ranges)
 
       # Calculate time taken
       time_taken = end_scan - start_scan
